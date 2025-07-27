@@ -6,6 +6,8 @@ from utils.config_loader import load_config
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_groq import ChatGroq
+from langchain_anthropic import ChatAnthropic
+
 #from langchain_openai import ChatOpenAI
 from logger.custom_logger import CustomLogger
 from exception.custom_exception import DocumentPortalException
@@ -29,7 +31,7 @@ class ModelLoader:
         Validate necessary environment variables.
         Ensure API keys exist.
         """
-        required_vars=["GOOGLE_API_KEY","GROQ_API_KEY"]
+        required_vars=["GOOGLE_API_KEY","GROQ_API_KEY","CLAUDE_API_KEY"]
         self.api_keys={key:os.getenv(key) for key in required_vars}
         missing = [k for k, v in self.api_keys.items() if not v]
         if missing:
@@ -59,7 +61,7 @@ class ModelLoader:
 
         log.info("Loading LLM...")
         
-        provider_key = os.getenv("LLM_PROVIDER", "google")  # Default groq
+        provider_key = os.getenv("LLM_PROVIDER", "claude")  # Default groq
         if provider_key not in llm_block:
             log.error("LLM provider not found in config", provider_key=provider_key)
             raise ValueError(f"Provider '{provider_key}' not found in config")
@@ -87,6 +89,14 @@ class ModelLoader:
                 temperature=temperature,
             )
             return llm
+        
+        elif provider == "anthropic":
+                llm=ChatAnthropic(
+                    model=model_name,
+                    api_key=self.api_keys["CLAUDE_API_KEY"],
+                    temperature=temperature,
+                )
+                return llm        
             
         # elif provider == "openai":
         #     return ChatOpenAI(
