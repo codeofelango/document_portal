@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Document Portal</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ====== THEME ====== */
+    :root {
+      --bg: #fafbfc;
+      --surface: #ffffff;
+      --glass: rgba(255, 255, 255, 0.9);
+      --text: #1a1d29;
+      --text-secondary: #6b7280;
+      --text-muted: #9ca3af;
+      --border: #e5e7eb;
+      --border-light: #f3f4f6;
+      --accent: #6366f1;
+      --accent-hover: #5855eb;
+      --accent-light: #eef2ff;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --radius: 12px;
+      --radius-sm: 8px;
+    }
+
+    /* Dark theme */
+    [data-theme="dark"] {
+      --bg: #0f1419;
+      --surface: #1a1f2e;
+      --glass: rgba(26, 31, 46, 0.9);
+      --text: #f8fafc;
+      --text-secondary: #cbd5e1;
+      --text-muted: #94a3b8;
+      --border: #334155;
+      --border-light: #475569;
+      --accent: #6366f1;
+      --accent-hover: #5855eb;
+      --accent-light: rgba(99, 102, 241, 0.1);
+    }
+
+    /* ====== RESETS ====== */
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Inter", system-ui, -apple-system, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.6;
+    }
+
+    /* ====== HEADER ====== */
+    .app-header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: var(--glass);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 24px;
+    }
+
+    .header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      color: white;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .theme-toggle {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 8px;
+      cursor: pointer;
+      color: var(--text-secondary);
+      transition: all 0.2s ease;
+    }
+
+    .theme-toggle:hover {
+      background: var(--accent-light);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* ====== NAVIGATION ====== */
+    .nav-tabs {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px 16px;
+      display: flex;
+      gap: 8px;
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .tab-btn {
+      background: none;
+      border: none;
+      padding: 12px 20px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-weight: 500;
+      color: var(--text-secondary);
+      transition: all 0.2s ease;
+      position: relative;
+    }
+
+    .tab-btn:hover {
+      background: var(--accent-light);
+      color: var(--accent);
+    }
+
+    .tab-btn.active {
+      background: var(--accent-light);
+      color: var(--accent);
+    }
+
+    .tab-btn.active::after {
+      content: '';
+      position: absolute;
+      bottom: -16px;
+      left: 20px;
+      right: 20px;
+      height: 2px;
+      background: var(--accent);
+      border-radius: 1px;
+    }
+
+    /* ====== LAYOUT ====== */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 32px 24px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 32px;
+      box-shadow: var(--shadow);
+      margin-bottom: 24px;
+    }
+
+    .card-header {
+      margin-bottom: 24px;
+    }
+
+    .card-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 0 0 8px 0;
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .card-description {
+      color: var(--text-secondary);
+      margin: 0;
+    }
+
+    /* ====== FORMS ====== */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 24px;
+      align-items: end;
+    }
+
+    .form-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    .form-section {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .field label {
+      font-weight: 500;
+      color: var(--text);
+      font-size: 14px;
+    }
+
+    .field input[type="text"],
+    .field input[type="number"] {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 12px 16px;
+      font-size: 14px;
+      color: var(--text);
+      transition: all 0.2s ease;
+    }
+
+    .field input[type="text"]:focus,
+    .field input[type="number"]:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-light);
+    }
+
+    .field input[type="file"] {
+      background: var(--surface);
+      border: 2px dashed var(--border);
+      border-radius: var(--radius-sm);
+      padding: 20px;
+      text-align: center;
+      cursor: pointer;
+      color: var(--text-secondary);
+      transition: all 0.2s ease;
+    }
+
+    .field input[type="file"]:hover {
+      border-color: var(--accent);
+      background: var(--accent-light);
+    }
+
+    .help-text {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    /* ====== BUTTONS ====== */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      border-radius: var(--radius-sm);
+      font-weight: 500;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: none;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+      box-shadow: var(--shadow);
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .btn-secondary {
+      background: var(--surface);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+      background: var(--accent-light);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* ====== RESULTS ====== */
+    .result-section {
+      margin-top: 32px;
+    }
+
+    .result-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      color: var(--text);
+    }
+
+    .code-block {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 20px;
+      font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+      font-size: 13px;
+      color: var(--text);
+      overflow: auto;
+      max-height: 400px;
+      white-space: pre-wrap;
+    }
+
+    .table-container {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+    }
+
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .table th,
+    .table td {
+      padding: 16px;
+      text-align: left;
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .table th {
+      background: var(--accent-light);
+      font-weight: 600;
+      color: var(--text);
+      font-size: 14px;
+    }
+
+    .table tbody tr:hover {
+      background: var(--accent-light);
+    }
+
+    .answer-block {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 20px;
+      min-height: 80px;
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    /* ====== TOGGLE SWITCH ====== */
+    .toggle-field {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .toggle-switch {
+      position: relative;
+      width: 48px;
+      height: 24px;
+      background: var(--border);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .toggle-switch input {
+      display: none;
+    }
+
+    .toggle-slider {
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 20px;
+      height: 20px;
+      background: white;
+      border-radius: 50%;
+      transition: transform 0.2s ease;
+      box-shadow: var(--shadow);
+    }
+
+    .toggle-switch input:checked + .toggle-slider {
+      transform: translateX(24px);
+    }
+
+    .toggle-switch input:checked ~ .toggle-switch {
+      background: var(--accent);
+    }
+
+    .toggle-switch.active {
+      background: var(--accent);
+    }
+
+    /* ====== TAB PANELS ====== */
+    .tab-panel {
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .tab-panel.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ====== FOOTER ====== */
+    .app-footer {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px;
+      border-top: 1px solid var(--border-light);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--text-secondary);
+      font-size: 14px;
+    }
+
+    /* ====== RESPONSIVE ====== */
+    @media (max-width: 768px) {
+      .header-content {
+        padding: 0 16px;
+      }
+
+      .nav-tabs {
+        padding: 0 16px 16px;
+        overflow-x: auto;
+      }
+
+      .container {
+        padding: 24px 16px;
+      }
+
+      .card {
+        padding: 24px 16px;
+      }
+
+      .form-grid,
+      .form-grid-2 {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+
+      .form-section {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* ====== STATUS INDICATORS ====== */
+    .status-indicator {
+      padding: 8px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+      margin-top: 16px;
+    }
+
+    .status-success {
+      background: rgba(16, 185, 129, 0.1);
+      color: var(--success);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+    }
+
+    .status-info {
+      background: var(--accent-light);
+      color: var(--accent);
+      border: 1px solid rgba(99, 102, 241, 0.2);
+    }
+
+    .loading {
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <div class="header-content">
+      <div class="brand">
+        <div class="logo">📚</div>
+        <h1>Document Portal</h1>
+      </div>
+      <div class="header-actions">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+      </div>
+    </div>
+  </header>
+
+  <nav class="nav-tabs">
+    <button class="tab-btn active" data-tab="analysis">📊 Document Analysis</button>
+    <button class="tab-btn" data-tab="compare">🔍 Document Compare</button>
+    <button class="tab-btn" data-tab="chat">💬 Doc Chat</button>
+  </nav>
+
+  <main class="container">
+    <!-- ============== ANALYSIS ============== -->
+    <section id="tab-analysis" class="tab-panel active">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">
+            <span>🔎</span>
+            Analyze a Document
+          </h2>
+          <p class="card-description">Upload a PDF document and get structured analysis with key insights and metadata.</p>
+        </div>
+        
+        <form id="form-analyze" class="form-grid" onsubmit="return false;">
+          <div class="field">
+            <label for="an-file">Upload PDF Document</label>
+            <input id="an-file" type="file" accept=".pdf" required />
+            <span class="help-text">Supported format: PDF files only</span>
+          </div>
+          <div>
+            <button id="btn-analyze" class="btn btn-primary">Run Analysis</button>
+          </div>
+        </form>
+
+        <div id="an-result" class="result-section">
+          <h3 class="result-title">Analysis Results</h3>
+          <div class="code-block" id="an-json">Waiting for analysis…</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============== COMPARE ============== -->
+    <section id="tab-compare" class="tab-panel">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">
+            <span>🆚</span>
+            Compare Two Documents
+          </h2>
+          <p class="card-description">Upload a reference PDF and an actual PDF to see page-wise differences and changes.</p>
+        </div>
+        
+        <form id="form-compare" class="form-grid-2" onsubmit="return false;">
+          <div class="field">
+            <label for="cmp-ref">Reference PDF</label>
+            <input id="cmp-ref" type="file" accept=".pdf" required />
+          </div>
+          <div class="field">
+            <label for="cmp-act">Actual PDF</label>
+            <input id="cmp-act" type="file" accept=".pdf" required />
+          </div>
+        </form>
+        
+        <div style="margin-top: 24px;">
+          <button id="btn-compare" class="btn btn-primary">Compare Documents</button>
+        </div>
+
+        <div id="cmp-result" class="result-section">
+          <h3 class="result-title">Comparison Results</h3>
+          <div class="table-container">
+            <table class="table" id="cmp-table">
+              <thead>
+                <tr>
+                  <th>Page</th>
+                  <th>Changes Detected</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td colspan="2" style="text-align: center; color: var(--text-muted);">No comparison data yet.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============== CHAT ============== -->
+    <section id="tab-chat" class="tab-panel">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">
+            <span>💬</span>
+            Chat with your Documents
+          </h2>
+          <p class="card-description">Upload documents and chat with them using RAG (Retrieval-Augmented Generation) technology.</p>
+        </div>
+
+        <form id="form-chat-index" onsubmit="return false;">
+          <div class="field">
+            <label for="chat-files">Upload Documents</label>
+            <input id="chat-files" type="file" multiple accept=".pdf,.docx,.txt" />
+            <span class="help-text">Supported formats: PDF, DOCX, TXT. You can select multiple files.</span>
+          </div>
+
+          <div class="form-section">
+            <div class="field">
+              <label for="chat-session">Session ID (optional)</label>
+              <input id="chat-session" type="text" placeholder="Leave blank for auto-generated session" />
+            </div>
+            <div class="field">
+              <label for="chat-chunk">Chunk Size</label>
+              <input id="chat-chunk" type="number" value="1000" min="200" step="100" />
+            </div>
+            <div class="field">
+              <label for="chat-overlap">Chunk Overlap</label>
+              <input id="chat-overlap" type="number" value="200" min="0" step="50" />
+            </div>
+            <div class="field">
+              <label for="chat-k">Top-K Results</label>
+              <input id="chat-k" type="number" value="5" min="1" max="20" />
+            </div>
+          </div>
+
+          <div class="field">
+            <div class="toggle-field">
+              <label>Use session-based FAISS indexing</label>
+              <label class="toggle-switch">
+                <input id="chat-sessionized" type="checkbox" checked />
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <div style="margin-top: 24px;">
+            <button id="btn-build" class="btn btn-primary">Build / Update Index</button>
+          </div>
+        </form>
+
+        <div style="height: 1px; background: var(--border-light); margin: 32px 0;"></div>
+
+        <form id="form-chat-ask" onsubmit="return false;">
+          <div class="field">
+            <label for="chat-q">Ask a Question</label>
+            <input id="chat-q" type="text" placeholder="Ask a question about your documents…" />
+          </div>
+          <div style="margin-top: 16px;">
+            <button id="btn-ask" class="btn btn-secondary">Send Question</button>
+          </div>
+        </form>
+
+        <div id="chat-meta" class="status-indicator status-info" style="display: none;"></div>
+
+        <div id="chat-ans" class="result-section">
+          <h3 class="result-title">Answer</h3>
+          <div class="answer-block" id="chat-answer">Upload documents and build the index to start chatting.</div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <div>© 2025 Document Portal • Advanced Document Processing</div>
+    <div style="font-size: 12px; color: var(--text-muted);">Powered by AI technology</div>
+  </footer>
+
+  <script>
+    // Base URL for API
+    const API_BASE = "";
+
+    // Theme toggle
+    function toggleTheme() {
+      const currentTheme = document.documentElement.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+    }
+
+    // Load saved theme
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+
+    // Tab switching
+    const tabs = document.querySelectorAll(".tab-btn");
+    const panels = document.querySelectorAll(".tab-panel");
+    
+    tabs.forEach(btn => {
+      btn.addEventListener("click", () => {
+        tabs.forEach(b => b.classList.remove("active"));
+        panels.forEach(p => p.classList.remove("active"));
+        btn.classList.add("active");
+        document.getElementById("tab-" + btn.dataset.tab).classList.add("active");
+      });
+    });
+
+    // Toggle switch functionality
+    document.getElementById('chat-sessionized').addEventListener('change', function() {
+      this.parentElement.classList.toggle('active', this.checked);
+    });
+
+    // ===== ANALYZE =====
+    document.getElementById("btn-analyze").addEventListener("click", async () => {
+      const file = document.getElementById("an-file").files[0];
+      const out = document.getElementById("an-json");
+      const btn = document.getElementById("btn-analyze");
+      
+      if (!file) { 
+        out.textContent = "Please upload a PDF file."; 
+        return; 
+      }
+
+      try {
+        btn.textContent = "Analyzing...";
+        btn.disabled = true;
+        out.textContent = "Running analysis, please wait…";
+        
+        const fd = new FormData();
+        fd.append("file", file);
+
+        const res = await fetch(`${API_BASE}/analyze`, { method: "POST", body: fd });
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({detail: res.statusText}));
+          throw new Error(err.detail || `HTTP ${res.status}`);
+        }
+        
+        const json = await res.json();
+        out.textContent = JSON.stringify(json, null, 2);
+      } catch (e) {
+        out.textContent = "Error: " + (e.message || e);
+      } finally {
+        btn.textContent = "Run Analysis";
+        btn.disabled = false;
+      }
+    });
+
+    // ===== COMPARE =====
+    document.getElementById("btn-compare").addEventListener("click", async () => {
+      const ref = document.getElementById("cmp-ref").files[0];
+      const act = document.getElementById("cmp-act").files[0];
+      const tbody = document.querySelector("#cmp-table tbody");
+      const btn = document.getElementById("btn-compare");
+
+      if (!ref || !act) {
+        tbody.innerHTML = `<tr><td colspan="2" style="text-align: center; color: var(--text-muted);">Please upload both PDF files.</td></tr>`;
+        return;
+      }
+
+      try {
+        btn.textContent = "Comparing...";
+        btn.disabled = true;
+        tbody.innerHTML = `<tr><td colspan="2" style="text-align: center;">Comparing documents, please wait…</td></tr>`;
+
+        const fd = new FormData();
+        fd.append("reference", ref);
+        fd.append("actual", act);
+
+        const res = await fetch(`${API_BASE}/compare`, { method: "POST", body: fd });
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({detail: res.statusText}));
+          throw new Error(err.detail || `HTTP ${res.status}`);
+        }
+        
+        const json = await res.json();
+        const rows = json.rows || [];
+        
+        if (!rows.length) {
+          tbody.innerHTML = `<tr><td colspan="2" style="text-align: center; color: var(--text-muted);">No differences found between documents.</td></tr>`;
+          return;
+        }
+        
+        tbody.innerHTML = rows.map(r => {
+          const page = r.Page ?? r.page ?? "";
+          const chg = r.Changes ?? r.changes ?? "";
+          return `<tr><td>${page}</td><td>${chg}</td></tr>`;
+        }).join("");
+      } catch (e) {
+        tbody.innerHTML = `<tr><td colspan="2" style="text-align: center; color: var(--text-muted);">Error: ${e.message || e}</td></tr>`;
+      } finally {
+        btn.textContent = "Compare Documents";
+        btn.disabled = false;
+      }
+    });
+
+    // ===== CHAT (index + ask) =====
+    let currentSession = null;
+
+    document.getElementById("btn-build").addEventListener("click", async () => {
+      const files = document.getElementById("chat-files").files;
+      const sessionId = document.getElementById("chat-session").value.trim();
+      const useSess = document.getElementById("chat-sessionized").checked;
+      const k = +document.getElementById("chat-k").value || 5;
+      const chunk = +document.getElementById("chat-chunk").value || 1000;
+      const overlap = +document.getElementById("chat-overlap").value || 200;
+      const meta = document.getElementById("chat-meta");
+      const btn = document.getElementById("btn-build");
+
+      if (!files.length) { 
+        showStatus("Please upload at least one file.", "error");
+        return; 
+      }
+
+      try {
+        btn.textContent = "Building Index...";
+        btn.disabled = true;
+        showStatus("Building index, please wait…", "info");
+
+        const fd = new FormData();
+        [...files].forEach(f => fd.append("files", f));
+        if (sessionId) fd.append("session_id", sessionId);
+        fd.append("use_session_dirs", useSess ? "true" : "false");
+        fd.append("chunk_size", String(chunk));
+        fd.append("chunk_overlap", String(overlap));
+        fd.append("k", String(k));
+
+        const res = await fetch(`${API_BASE}/chat/index`, { method: "POST", body: fd });
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({detail: res.statusText}));
+          throw new Error(err.detail || `HTTP ${res.status}`);
+        }
+        
+        const json = await res.json();
+        currentSession = json.session_id || sessionId || null;
+        showStatus(`Index built successfully! Session: ${currentSession || "(none)"}, Top-K: ${json.k}`, "success");
+      } catch (e) {
+        showStatus("Indexing failed: " + (e.message || e), "error");
+      } finally {
+        btn.textContent = "Build / Update Index";
+        btn.disabled = false;
+      }
+    });
+
+    document.getElementById("btn-ask").addEventListener("click", async () => {
+      const q = document.getElementById("chat-q").value.trim();
+      const ans = document.getElementById("chat-answer");
+      const useSess = document.getElementById("chat-sessionized").checked;
+      const k = +document.getElementById("chat-k").value || 5;
+      const btn = document.getElementById("btn-ask");
+
+      if (!q) { 
+        ans.textContent = "Please enter a question."; 
+        return; 
+      }
+      
+      if (useSess && !currentSession) {
+        ans.textContent = "Please build the index first (session-based mode is enabled).";
+        return;
+      }
+
+      try {
+        btn.textContent = "Thinking...";
+        btn.disabled = true;
+        ans.textContent = "Processing your question…";
+
+        const fd = new FormData();
+        fd.append("question", q);
+        fd.append("use_session_dirs", useSess ? "true" : "false");
+        fd.append("k", String(k));
+        if (useSess && currentSession) fd.append("session_id", currentSession);
+
+        const res = await fetch(`${API_BASE}/chat/query`, { method: "POST", body: fd });
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({detail: res.statusText}));
+          throw new Error(err.detail || `HTTP ${res.status}`);
+        }
+        
+        const json = await res.json();
+        ans.textContent = json.answer || "No answer received.";
+      } catch (e) {
+        ans.textContent = "Query failed: " + (e.message || e);
+      } finally {
+        btn.textContent = "Send Question";
+        btn.disabled = false;
+      }
+    });
+
+    // Status display helper
+    function showStatus(message, type = "info") {
+      const meta = document.getElementById("chat-meta");
+      meta.textContent = message;
+      meta.className = `status-indicator status-${type}`;
+      meta.style.display = "block";
+      
+      if (type === "success") {
+        setTimeout(() => {
+          meta.style.display = "none";
+        }, 5000);
+      }
+    }
+
+    // Enter key support for forms
+    document.getElementById("chat-q").addEventListener("keypress", (e) => {
+      if (e.key === "Enter") {
+        document.getElementById("btn-ask").click();
+      }
+    });
+
+    // File drag and drop enhancement
+    function setupFileDrop(inputId) {
+      const input = document.getElementById(inputId);
+      const container = input.parentElement;
+      
+      ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        container.addEventListener(eventName, preventDefaults, false);
+      });
+
+      function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+
+      ['dragenter', 'dragover'].forEach(eventName => {
+        container.addEventListener(eventName, highlight, false);
+      });
+
+      ['dragleave', 'drop'].forEach(eventName => {
+        container.addEventListener(eventName, unhighlight, false);
+      });
+
+      function highlight(e) {
+        container.style.borderColor = 'var(--accent)';
+        container.style.background = 'var(--accent-light)';
+      }
+
+      function unhighlight(e) {
+        container.style.borderColor = '';
+        container.style.background = '';
+      }
+
+      container.addEventListener('drop', handleDrop, false);
+
+      function handleDrop(e) {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        input.files = files;
+      }
+    }
+
+    // Initialize drag and drop for file inputs
+    setupFileDrop('an-file');
+    setupFileDrop('cmp-ref');
+    setupFileDrop('cmp-act');
+    setupFileDrop('chat-files');
+  </script>
+</body>
+</html>
